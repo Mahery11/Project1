@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main() {
-  
-  return 0;
+    print("This is the first version");
+    return 0;
 }
