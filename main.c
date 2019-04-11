@@ -12,7 +12,6 @@ char encryptSub(char *input);
 int main() {
 //NEXT TASK: CONVERT WRITTEN INPUT into identifiable/modifiable text
 //TURN THE ALPHABET INTO A FUNCTION SO IT IS NOT BLOCKED INTO THE MIDDLE OF MAIN
-
     char input[50] = {};
     int pick = 0;
     printf("What is the message you wish to encrypt/decrypt?\n");
@@ -65,8 +64,27 @@ int decryptRotgiven_all(void) {
     
 }*/
 
-char encryptSub(char *input) {
-    int i, n;
+char encryptSub(char *input) { //incomplete
+    //int i, n;
+    char alphabet[50]; //normal alphabet
+    char key[50]; //encryption key alphabet
+    srand(time(NULL)); //makes it so every rand value allocated will be randomised/a new value from the last
+    for (char c=0; c<=26; c++) { //[ is one ASCII value higher than Z
+        if (c>25) { 
+            alphabet[c] = '\0'; break;
+        }
+        alphabet [c] = c+65; //assigning alphabet to an element in this string
+}
+    for (char c=0; c<=26; c++) {
+        if (c>25) {
+            key[c] = '\0'; break
+        }
+        key[c] = alphabet[c] + (int)(rand() % 26); //adds a value to each element which will be randomly allocated and will not exceed the ASCII limit - ideally.
+        //This won't work because how will you then allocate a value to the lower numbered ASCII's such as A or B.
+    }
+    //each value needs to randomly assigned to a different variable with the key stored, additionally, values cannot be assigned to the same value.
+    //using this string change each value to something + rand() % 26 + 1 (and watch for ASCII limit), as well as something to make sure two values cannot be the same.
+    //will need to apply something similar to the previous rotation encryption to ensure it does not exceed the limit
     return 0;
 }
 /*
