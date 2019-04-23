@@ -2,23 +2,34 @@
 #include <string.h>
 
 //prototypes for all different cipher types
-int encryptRot(char *input);
-//int decryptRotgiven_all(void); 
-char encryptSub(char *input, char *alpha);
+void encryptRot(char *str_adj, char *alpha, char *key);
+void decryptRotgiven_all(char *str_adj, char *alpha, char *key); 
+char encryptSub(char *str_adj, char *alpha);
 //int decrpytSubgiven_all(void);
-//int decryptRotgiven_cipher(void);
-//int decryptSubgiven_cipher(void);*/
+//int decryptRotgiven_text(void);
+//int decryptSubgiven_text(void);*/
 void Alphabet_f(char *alpha);
 
 int main() {
-//NEXT TASK: CONVERT WRITTEN INPUT into identifiable/modifiable text
+//NEXT TASK: CONVERT WRITTEN str_adj into identifiable/modifiable text
 //TURN THE ALPHABET INTO A FUNCTION SO IT IS NOT BLOCKED INTO THE MIDDLE OF MAIN
     char alpha[26]; //creates a string for the basic alphabet string to exist
-    Alphabet_f(alpha); //assigns a letter from A-Z to each element of the string
-    char input[50]/* = "HELLO"*/; //Added "HELLO" and commented out standard input for time sake
-    int pick = 0, Rkey;
-    printf("What is the message you wish to encrypt/decrypt?\n");
-    scanf("%s", input); //replace with File I/O to read white space
+    char key[26]; //EXISTS AS SOMETHING TO BE COMPARED TO THE ALPHABET FUNCTION TO SHOW THE KEY
+    char str_adj[50] = "THIS is a MEsSage with WhiTe SpaCES"; //CURRENTLY HARD CODED AND MUST BE REPLACED BY FILE I/O
+    for (int i=0; str_adj[i]; i++) {
+        if (str_adj[i]>=97 && str_adj[i]<=122) //checking for lowercase
+            str_adj[i] = str_adj[i] - 32; //fixing lowercase
+        if (str_adj[i]<65 || str_adj[i]>122) //checks if it is not within the ASCII range and does not change it if is
+            str_adj[i] = str_adj[i];
+    }
+    char origin_mes[50];
+    int pick = 0;
+    for (int i=0; str_adj[i]; i++) {
+        origin_mes[i] = str_adj[i];
+    }
+    Alphabet_f(alpha); //assigns a letter from A-Z to each element of the string AND FIXES ANY ANOMALIES IN THE MESSAGE (may implement later for shorter functions)
+    //printf("What is the message you wish to encrypt/decrypt?\n");
+    //scanf("%s", str_adj); //replace with File I/O to read white space
     int fail=1;
     while (fail==1) {
     printf("Which of the following options do you wish to do with this message? (Select 1-n)\n"); //list printed over several lines, so it is easier to read
@@ -27,51 +38,80 @@ int main() {
     printf("5. Decryption of a rotation cipher, given the cipher text\n6. Decryption of a substitution cipher, given the cipher text\n");
     scanf("%d", &pick);//deciding which cipher subject is to be used*/
     switch (pick){ 
-        case (1): Rkey = encryptRot(input); fail=0; break; //calls the rotation encryption function and reassigns input to the encryption
-        //case (2): decryptRotgiven_all(input); fail=0; break;
-        case (3): encryptSub(input, alpha); fail=0; break;
-        //case (4): decryptSubgiven_all(input); fail=0; break;
-        //case (5): decryptRotgiven_cipher(input); fail=0; break;
-        //case (6): decryptSubgiven_cipher(input); fail=0; break;
+        case (1): encryptRot(str_adj, alpha, key); fail=0; break; //calls the rotation encryption function and reassigns str_adj to the encryption
+        case (2): decryptRotgiven_all(str_adj, alpha, key); fail=0; break;
+        case (3): encryptSub(str_adj, alpha); fail=0; break;
+        //case (4): decryptSubgiven_all(str_adj); fail=0; break;
+        //case (5): decryptRotgiven_text(str_adj); fail=0; break;
+        //case (6): decryptSubgiven_text(str_adj); fail=0; break;
         default: printf("Option selected does not exist\nEnsure the option chosen is the number corresponding to the option desired\n"); fail = 1;
         }
     }
-    printf("%s\n", input);
-    printf("Encryption key: %d\n", Rkey);
+    printf("Original message: %s\nCiphered message: %s\n", origin_mes, str_adj);
+    printf("Encryption key: \n%s\n%s\n", alpha, key);
     return 0;
 }
 
 
 //defintion of the cipher functions
-int encryptRot (char *input) { //is functioning - CANNOT READ WHITE SPACE CURRENTLY
+void encryptRot (char *str_adj, char *alpha, char *key) { //is functioning - CANNOT READ WHITE SPACE CURRENTLY
     int i, n;
-    printf("What is the rotation number for this cipher?\n");
+    printf("What is the rotation number for this cipher? (Scale exists between -25 and 25)\n");
     scanf("%d", &n); //n = rotation key scale
     if (n!=0) {
-    for (i=0; input[i]; i++) {
-            if (input[i]>=97 && input[i]<=122) //checking for lowercase
-                input[i] = input[i] - 32; //fixing lowercase
-            if (input[i]<65 || input[i]>122) //checks if it is not within the ASCII range and does not change it if is
-                input[i] = input[i];
-            else { //if it is in the correct range it will continue as normal.
-            input[i] = (char)input[i] + n; //for whatever rotation keys, the function will add/substitute each element of the string by what rotation key scale has been given
-            if (input[i] > 90)
-                input[i] = (char)(input[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters
-            if (input[i] < 65)
-                input[i] = (char)(input[i]) + 26; //if the encryption rotation is below the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
+    for (i=0; str_adj[i]; i++) {
+            str_adj[i] = (char)str_adj[i] + n; //for whatever rotation keys, the function will add/substitute each element of the string by what rotation key scale has been given
+            if (str_adj[i] > 90)
+                str_adj[i] = (char)(str_adj[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters
+            if (str_adj[i] < 65)
+                str_adj[i] = (char)(str_adj[i]) + 26; //if the encryption rotation is below the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
                 }
             }
-        }
     else if (n==0) //if the rotation number is 0, nothing will change, so it skips reassignment of the string
-        printf("Since the rotation number is 0, the message will not change\n");
-    return n; //reassigns the string input to the main function which can be freely manipulated
+    printf("Since the rotation number is 0, the message will not change\n");
+    for (i=0; alpha[i]; i++) { //creates a string that is the key of the cipher which can be clearly observed in the final output
+        key[i] = alpha[i] + n;
+            if (key[i] > 90)
+                key[i] = (char)(key[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters
+            if (key[i] < 65)
+                key[i] = (char)(key[i]) + 26; //if the encryption rotation is below the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
+    }
 }
-/*
-int decryptRotgiven_all(void) {
-    
-}*/
 
-char encryptSub(char *input, char *alpha) { //incomplete
+void decryptRotgiven_all(char *str_adj, char *alpha, char *key) {
+    int i, k, n;
+    printf("What is the key of this cipher?\n1. Determine the scale with a number\n2. Enter the exact key (all caps, no spaces)\n");
+    scanf("%d", &k);
+    if (k == 1) {
+        printf("What is the rotation number for this cipher? (Scale exists between -25 and 25)\n");
+        scanf("%d", &n);
+        //if ((n>25) || (n<-25)
+        n = n % 26;
+        for (i=0; alpha[i]; i++) { //creates a string that is the key of the cipher which can be clearly observed in the final output
+            key[i] = alpha[i] + n;
+            if (key[i] > 90)
+                key[i] = (char)(key[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters
+            if (key[i] < 65)
+                key[i] = (char)(key[i]) + 26; //if the encryption rotation is below the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
+            }
+    }
+    if (k == 2) {
+        printf("Enter the exact key of this cipher: ");
+        scanf("%s", key);
+    }
+    for (i=0; str_adj[i]; i++) {
+        if (k==1) { //checks if a rotation number has been given or if it must be calculated
+            str_adj[i] = str_adj[i] + n;
+        }
+    else {
+        n = (char)key[0] - (char)alpha[0];    
+        i--;
+        k = 1;
+        }
+    }
+}
+
+char encryptSub(char *str_adj, char *alpha) { //incomplete
     //int i, n;
     char key[50]; //encryption key alphabet
     //srand(time(NULL)); //makes it so every rand value allocated will be randomised/a new value from the last
