@@ -4,7 +4,7 @@
 //prototypes for all different cipher types
 void encryptRot(char *str_adj, char *alpha, char *key);
 void decryptRotgiven_all(char *str_adj, char *alpha, char *key); 
-char encryptSub(char *str_adj, char *alpha);
+void encryptSub(char *str_adj, char *alpha, char *key);
 //int decrpytSubgiven_all(void);
 //int decryptRotgiven_text(void);
 //int decryptSubgiven_text(void);
@@ -15,12 +15,13 @@ int main() {
 //TURN THE ALPHABET INTO A FUNCTION SO IT IS NOT BLOCKED INTO THE MIDDLE OF MAIN
     char alpha[26]; //creates a string for the basic alphabet string to exist
     char key[26]; //EXISTS AS SOMETHING TO BE COMPARED TO THE ALPHABET FUNCTION TO SHOW THE KEY
-    char str_adj[50] = "THIS is a MEsSage with WhiTe SpaCEs"; //CURRENTLY HARD CODED AND MUST BE REPLACED BY FILE I/O
+    char str_adj[50] = "Hey LoserS"; //CURRENTLY HARD CODED AND MUST BE REPLACED BY FILE I/O
     char origin_mes[50];
     int pick = 0;
     for (int i=0; str_adj[i]; i++) { //retains the original message and it's respective characters
         origin_mes[i] = str_adj[i]; //Need to apply a null factor at the end of this, for some reason capital letters are unaffected and this string prints out normally
                                     //However if it finishes with a lower case it is followed by an @ symbol in the final output.
+                                    //use strcpy(s1, s2) - LEARN HOW TO USE THIS
         }
     Alphabet_f(alpha); //assigns a letter from A-Z to each element of the string AND FIXES ANY ANOMALIES IN THE MESSAGE (may implement later for shorter functions)
     //printf("What is the message you wish to encrypt/decrypt?\n");
@@ -31,19 +32,19 @@ int main() {
     printf("1. Rotation encryption\n2. Decryption of a rotation cipher, given the cipher text and rotation amount\n");
     printf("3. Substitution encryption\n4. Decryption of a substitution cipher, given the cipher text and rotation amount\n");
     printf("5. Decryption of a rotation cipher, given the cipher text\n6. Decryption of a substitution cipher, given the cipher text\n");
-    scanf("%d", &pick);//deciding which cipher subject is to be used*/
+    scanf("%d", &pick); //deciding which cipher subject is to be used
     switch (pick){ 
         case (1): encryptRot(str_adj, alpha, key); fail=0; break; //calls the rotation encryption function and reassigns str_adj to the encryption
         case (2): decryptRotgiven_all(str_adj, alpha, key); fail=0; break;
-        case (3): encryptSub(str_adj, alpha); fail=0; break;
+        case (3): encryptSub(str_adj, alpha, key); fail=0; break;
         //case (4): decryptSubgiven_all(str_adj); fail=0; break;
         //case (5): decryptRotgiven_text(str_adj); fail=0; break;
         //case (6): decryptSubgiven_text(str_adj); fail=0; break;
         default: printf("Option selected does not exist\nEnsure the option chosen is the number corresponding to the option desired\n"); fail = 1;
         }
     }
-    printf("Entered message:  %s\nCiphered message: %s\n", origin_mes, str_adj);
-    printf("Encryption key: \n%s\n%s\n", alpha, key);
+    printf("Entered message:  %s\nCiphered message: %s\n", origin_mes, str_adj); //prints the originally entered message and the ciphered message on different lines
+    printf("Encryption key: \nCipher:   %s\nAlphabet: %s\n", key, alpha); //prints the encryption key by showing a comparison of the alphabet to the ciphered alphabet
     return 0;
 }
 
@@ -79,9 +80,7 @@ void encryptRot (char *str_adj, char *alpha, char *key) { //is functioning - CAN
     }
 }
 
-void decryptRotgiven_all(char *str_adj, char *alpha, char *key) { //THERE IS A LOT OF BUGS IN THIS CODE
-//WHITE SPACE IS STILL BEING CHANGED UNLIKE THE ENCRYPTION
-//Scaling works correctly, now it is simply accounting for white space
+void decryptRotgiven_all(char *str_adj, char *alpha, char *key) {
     int i, k, n; //declaring multiple variables that will be used for different things
     printf("What is the key of this cipher?\n1. Determine the scale with a number\n2. Enter the exact key (all caps, no spaces)\n");
     scanf("%d", &k); //scanned for an option as to how the cipher will be entered
@@ -103,9 +102,13 @@ void decryptRotgiven_all(char *str_adj, char *alpha, char *key) { //THERE IS A L
     }
     for (i=0; str_adj[i]; i++) {
         if (k==1) { //checks if a rotation number has been given or if it must be calculated
-            //a filter for white space needs to be added here - also unsure if they are even elements that even exist.
-            str_adj[i] = str_adj[i] + n; //STILL NEEDS TO ACCOUNT FOR WHITE SPACE, this adjusts the string according to the rotation number (which will usually be 
-            // changed in sign as it must have the reverse effect of a rotation encryption)
+            if (str_adj[i]<65 || str_adj[i]>122) //checks if it is not within the ASCII range and does not change it if is
+                str_adj[i] = str_adj[i];
+            else {
+            if (str_adj[i]<123 && str_adj[i]>96) //accounts for lowercase letters
+                str_adj[i] = str_adj[i] - 32;
+            str_adj[i] = str_adj[i] + n; //this adjusts the string according to the rotation number
+            }
         }
         else { //if the rotation number has not been given, it must be calculated by finding the difference between the cipher string and the regular alphabet string
                //using ASCII numbers
@@ -116,28 +119,30 @@ void decryptRotgiven_all(char *str_adj, char *alpha, char *key) { //THERE IS A L
     }
 }
 
-char encryptSub(char *str_adj, char *alpha) { //incomplete
-    //int i, n;
-    char key[50]; //encryption key alphabet
-    //srand(time(NULL)); //makes it so every rand value allocated will be randomised/a new value from the last
-    for (int c=0; c<=26; c++) {
-        if (c>25) {
-            key[c] = '\0'; break;
-        }
-        //key[c] = alpha[c] + (int)(rand() % 26); //adds a value to each element which will be randomly allocated and will not exceed the ASCII limit - ideally.
-        //if ((char)key[c]>90)
-            //key[c] = key[c] - 26;
-        //This won't work because how will you then allocate a value to the lower numbered ASCII's such as A or B.
-        //Figuring out how to create the encryption cipher is next challenge
+void encryptSub(char *str_adj, char *alpha, char *key) { 
+    int i, n;
+    printf("What is the exact key of this cipher? Enter from first element to last in all caps with no spaces: ");
+    scanf("%s", key); //asking for the cipher key to be given - a random generator could be achieved but has not been specified and is unnecessary
+    for (i=0; str_adj[i]; i++) {
+        if (str_adj[i]>=97 && str_adj[i]<=122) //checking for lowercase before changing anything
+                str_adj[i] = str_adj[i] - 32; //fixing lowercase if it exists
+            if (str_adj[i]<65 || str_adj[i]>90) { //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
+                                                  //to be included in the encryption
+                str_adj[i] = str_adj[i];
+            }
+            else { //if it is a normal character within the ASCII range of capital letters, the following will proceed
+                for (n=0; alpha[n]; n++){ //this loop checks every element in the alphabet function in ascending order
+                    if (str_adj[i]==alpha[n]) { //every cycle, the loop checks which nth element of alpha is equal to our given message
+                         //the number of this element (n) is recorded to be used later as the strings correlate as can be seen in the final screen when compared
+                        break; //k=n is probably unnecessary to be honest
+                    } 
+                }
+            str_adj[i] = key[n]; //reassigns the ith element of the message to the corresponding letter of the key as determined from above, encrypting the message
+            }
     }
-    printf("%s\n", key);
-    //each value needs to randomly assigned to a different variable with the key stored, additionally, values cannot be assigned to the same value.
-    //using this string change each value to something + rand() % 26 + 1 (and watch for ASCII limit), as well as something to make sure two values cannot be the same.
-    //will need to apply something similar to the previous rotation encryption to ensure it does not exceed the limit
-    return 0;
 }
-/*
-int decryptSubgiven_all(void) {
+
+/*int decryptSubgiven_all(void) {
     
 }*/
 
