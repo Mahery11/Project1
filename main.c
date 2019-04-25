@@ -5,17 +5,16 @@
 void encryptRot(char *str_adj, char *alpha, char *key);
 void decryptRotgiven_all(char *str_adj, char *alpha, char *key); 
 void encryptSub(char *str_adj, char *alpha, char *key);
-//int decrpytSubgiven_all(void);
+void decrpytSubgiven_all(char *str_adj, char *alpha, char *key);
 //int decryptRotgiven_text(void);
 //int decryptSubgiven_text(void);
 void Alphabet_f(char *alpha);
 
 int main() {
 //NEXT TASK: CONVERT WRITTEN str_adj into identifiable/modifiable text
-//TURN THE ALPHABET INTO A FUNCTION SO IT IS NOT BLOCKED INTO THE MIDDLE OF MAIN
     char alpha[26]; //creates a string for the basic alphabet string to exist
     char key[26]; //EXISTS AS SOMETHING TO BE COMPARED TO THE ALPHABET FUNCTION TO SHOW THE KEY
-    char str_adj[50] = "Hey LoserS"; //CURRENTLY HARD CODED AND MUST BE REPLACED BY FILE I/O
+    char str_adj[50] = "It ActuALLY Works"; //CURRENTLY HARD CODED AND MUST BE REPLACED BY FILE I/O
     char origin_mes[50];
     int pick = 0;
     for (int i=0; str_adj[i]; i++) { //retains the original message and it's respective characters
@@ -37,7 +36,7 @@ int main() {
         case (1): encryptRot(str_adj, alpha, key); fail=0; break; //calls the rotation encryption function and reassigns str_adj to the encryption
         case (2): decryptRotgiven_all(str_adj, alpha, key); fail=0; break;
         case (3): encryptSub(str_adj, alpha, key); fail=0; break;
-        //case (4): decryptSubgiven_all(str_adj); fail=0; break;
+        case (4): decrpytSubgiven_all(str_adj, alpha, key); fail=0; break;
         //case (5): decryptRotgiven_text(str_adj); fail=0; break;
         //case (6): decryptSubgiven_text(str_adj); fail=0; break;
         default: printf("Option selected does not exist\nEnsure the option chosen is the number corresponding to the option desired\n"); fail = 1;
@@ -134,7 +133,7 @@ void encryptSub(char *str_adj, char *alpha, char *key) {
                 for (n=0; alpha[n]; n++){ //this loop checks every element in the alphabet function in ascending order
                     if (str_adj[i]==alpha[n]) { //every cycle, the loop checks which nth element of alpha is equal to our given message
                          //the number of this element (n) is recorded to be used later as the strings correlate as can be seen in the final screen when compared
-                        break; //k=n is probably unnecessary to be honest
+                        break;
                     } 
                 }
             str_adj[i] = key[n]; //reassigns the ith element of the message to the corresponding letter of the key as determined from above, encrypting the message
@@ -142,9 +141,27 @@ void encryptSub(char *str_adj, char *alpha, char *key) {
     }
 }
 
-/*int decryptSubgiven_all(void) {
-    
-}*/
+void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //this decryption is nearly identical to the encryption, it simply only has two steps changed (lines 156, 161)
+    int i, n;
+    printf("What is the exact key of this cipher? Enter from first element to last in all caps with no spaces: ");
+    scanf("%s", key); //asking for the cipher key to be given - a random generator could be achieved but has not been specified and is unnecessary
+    for (i=0; str_adj[i]; i++) {
+        if (str_adj[i]>=97 && str_adj[i]<=122) //checking for lowercase before changing anything
+                str_adj[i] = str_adj[i] - 32; //fixing lowercase if it exists
+            if (str_adj[i]<65 || str_adj[i]>90) { //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space to be included
+                str_adj[i] = str_adj[i];
+            }
+            else { //if it is a normal character within the ASCII range of capital letters, the following will proceed
+                for (n=0; alpha[n]; n++){ //this loop checks every element in the alphabet function in ascending order
+                    if (str_adj[i]==key[n]) { //every cycle, the loop checks which nth element of alpha is equal to our given message
+                         //the number of this element (n) is recorded to be used later as the strings correlate as can be seen in the final screen when compared
+                        break;
+                    } 
+                }
+            str_adj[i] = alpha[n]; //reassigns the ith element of the message to the corresponding letter of the key as determined from above, decrypting the message
+            }
+    }
+}
 
 void Alphabet_f(char *alpha) { //function to create an alphabet at the beginning of the program when it is executed
     for (int c=0; c<=26; c++) { //assigns from elements 0 to 25 letters A-Z
