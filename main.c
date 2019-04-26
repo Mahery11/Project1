@@ -148,6 +148,7 @@ void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { ///a function 
     
     //this will need an extra array/function of the dictionary, which may have to be implemented using File I/O (Might be for the best)
 }*/
+
 /*void decryptSubgiven_text(char *str_adj, char *alpha, char *key) {
     
 }*/
