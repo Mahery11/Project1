@@ -6,32 +6,18 @@ void encryptRot(char *str_adj, char *alpha, char *key);
 void decryptRotgiven_all(char *str_adj, char *alpha, char *key); 
 void encryptSub(char *str_adj, char *alpha, char *key);
 void decrpytSubgiven_all(char *str_adj, char *alpha, char *key);
-//void decryptRotgiven_text(char *str_adj, char *alpha, char *key);
+void decryptRotgiven_text(char *str_adj, char *alpha, char *key);
 //void decryptSubgiven_text(char *str_adj, char *alpha, char *key);
-void startupf(char *alpha, char *str_adj, char *origin_mes);
+void lower_case(/*char *alpha, */char *str_adj);
+void upper_case(char *str_adj);
+void startupf(char *alpha, char *str_adj, char *origin_mes, char *key);
 
 int main() {
-    FILE *input; 
     char str_adj[100]; //creates an empty string that will be used to copy the original message from the input.txt and also be used throughout, changing to meet the cipher 
-    input = fopen("input.txt", "r"); //reads from the text in the input txt file
-    if (input==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
-        perror("File did not open correctly");
-    else {
-        fgets(str_adj, 100, input); //makes the text from the input txt file into a string
-        fclose(input); //closes the file, as it is no longer needed
-    }
-    FILE *cipher;
     char key[27]; //creates an empty string that will be used throughout as the cipher key - this step will be irrelevant if options 5 or 6 are selected in the user interface
-    cipher = fopen("cipher.txt", "r+"); //reads from the text in the cipher txt file
-    if (cipher==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
-        perror("File did not open correctly");
-    else {
-        fgets(key, 27, cipher); //makes the text from the cipher txt file into a string that will be used as a key
-        fclose(cipher); //closes the file, as it is no longer needed
-    }
     char origin_mes[100]; //creates a string that will not change throughout the course of the program as it exists simply to store the original message for later comparison
     char alpha[27]; //creates a string for the basic alphabet string to exist, which will be used in determining keys and or editing messages and for final comparison
-    startupf(alpha, str_adj, origin_mes); //calls a function which will assign many prerequisite values required in the above variables (also makes the main less messy)
+    startupf(alpha, str_adj, origin_mes, key); //calls a function which will assign many prerequisite values required in the above variables (also makes the main less messy)
     int pick = 0;
     int fail = 1;
     while (fail==1) { //this condition exists in case an incorrect option is entered below that is not within the 1-6 range of options provided, allowing it to continue
@@ -40,15 +26,16 @@ int main() {
         printf("1. Rotation encryption\n2. Decryption of a rotation cipher, given the cipher text and rotation amount\n");
         printf("3. Substitution encryption\n4. Decryption of a substitution cipher, given the cipher text and rotation amount\n");
         printf("5. Decryption of a rotation cipher, given the cipher text\n6. Decryption of a substitution cipher, given the cipher text\n");
+        printf("7. Decryption of a ciphered message, where the type of cryptography and the key is unknown\n");
         scanf("%d", &pick); //deciding which cipher subject is to be used
         switch (pick){ 
-            case (1): encryptRot(str_adj, alpha, key); break; //calls the rotation encryption function and using a pointer passes the adjustable string, alphabet and key
-            case (2): decryptRotgiven_all(str_adj, alpha, key); break; //calls the substitution encryption function and using a pointer passes the adjustable string, alphabet and key
-            case (3): encryptSub(str_adj, alpha, key); break; //calls the rotation decryption function and using a pointer passes the adjustable string, alphabet and key
-            case (4): decrpytSubgiven_all(str_adj, alpha, key); break; //calls the substitution decryption function and using a pointer passes the adjustable string, alphabet and key
-            //case (5): decryptRotgiven_text(str_adj, alpha, key); break;
-            //case (6): decryptSubgiven_text(str_adj, alpha, key); break;
-            //case (7): unknown_decrypt(str_adj, alpha, key); break;
+            case (1): encryptRot(str_adj, alpha, key); fail=0; break; //calls the rotation encryption function and using a pointer passes the adjustable string, alphabet and key
+            case (2): decryptRotgiven_all(str_adj, alpha, key); fail=0; break; //calls the substitution encryption function and using a pointer passes the adjustable string, alphabet and key
+            case (3): encryptSub(str_adj, alpha, key); fail=0; break; //calls the rotation decryption function and using a pointer passes the adjustable string, alphabet and key
+            case (4): decrpytSubgiven_all(str_adj, alpha, key); fail=0; break; //calls the substitution decryption function and using a pointer passes the adjustable string, alphabet and key
+            case (5): lower_case(/*alpha, */str_adj); decryptRotgiven_text(str_adj, alpha, key); fail=0; break;
+            //case (6): lower_case(/*alpha, */str_adj); decryptSubgiven_text(str_adj, alpha, key); fail=0; break;
+            //case (7): unknown_decrypt(str_adj, alpha, key); fail=0; break;
             default: printf("Option selected does not exist\nEnsure the option chosen is the number corresponding to the option desired\n");
             }
     }
@@ -144,20 +131,36 @@ void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //defining the
     }
 }
 
-/*void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message without a given cipher key (rotation)
-    int i, n;
-    for (n=0; n<26; n++) { //n is the rotation number, which will increase incremently with each key tested
-        for (i=0; str_adj[i]; i++) {
-            if (str_adj[i]<65 || str_adj[i]>90)  //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
-                str_adj[i] = str_adj[i];
-                
-            str_adj[i] = str_adj[i] + n;
-            if (str_adj[i] > 90)
-                str_adj[i] = (char)(str_adj[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
-            }
-        
-        }
+void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message without a given cipher key (rotation)
+    int i = 0;//, k, n=1;
+    char dictionary[3000];
+    FILE *words = fopen("words.txt", "r");
+    if (words==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error 
+        perror("File did not open correctly");
+    else {
+        while (fgets(dictionary, 3001, words)) {
+            i++;
+            //printf("Line %d: -> %s", i, dictionary);
+        } //makes the text from the input txt file into a string
     }
+    fclose(words); //closes the file, as it is no longer needed
+    printf("%s", dictionary[55]); //how to print a specific element of a string???
+
+    /*for (k=0; k<26; k++) { //n is the rotation number, which will increase incremently with each key tested
+            for (i=0; str_adj[i]; i++) { //loop serves the purpose of changing the entered message to a different key to be tested
+                if (str_adj[i]<65 || str_adj[i]>90)  //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
+                    str_adj[i] = str_adj[i];
+                    
+                str_adj[i] = str_adj[i] + n; //is not lower case due to the difficulties of being so close to the ASCII limit of 127
+                if (str_adj[i] > 90)
+                    str_adj[i] = (char)(str_adj[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will allow it to return to our range of 65 - 90 characters  
+            }
+            lower_case(str_adj);
+            
+            //if it fails readjust so it can be easily changed in the next check
+            upper_case(str_adj);
+    }*/
+}
     //We will be given the string of the message
     //Various keys will need to be tested incremently, changing the encrypted message
     //This changed message will need to be tested to see if any common words can be found in its arrangement
@@ -166,13 +169,28 @@ void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //defining the
     //Difficulty: Finding a particular word within the string and making the dictionary string/file to be compared to.
     
     //this will need an extra array/function of the dictionary, which may have to be implemented using File I/O (Might be for the best)
-}*/
 
 /*void decryptSubgiven_text(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message without a given key (substitution)
     
 }*/
 
-void startupf(char *alpha, char *str_adj, char *origin_mes) { //function to create an alphabet at the beginning of the program when it is executed
+void startupf(char *alpha, char *str_adj, char *origin_mes, char *key) { //function to create an alphabet at the beginning of the program when it is executed
+    FILE *input; 
+    input = fopen("input.txt", "r"); //reads from the text in the input txt file
+    if (input==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
+        perror("File did not open correctly");
+    else {
+        fgets(str_adj, 100, input); //makes the text from the input txt file into a string
+        fclose(input); //closes the file, as it is no longer needed
+    }
+    FILE *cipher;
+    cipher = fopen("cipher.txt", "r+"); //reads from the text in the cipher txt file
+    if (cipher==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
+        perror("File did not open correctly");
+    else {
+        fgets(key, 27, cipher); //makes the text from the cipher txt file into a string that will be used as a key
+        fclose(cipher); //closes the file, as it is no longer needed
+    }
     for (int c=0; c<=26; c++) { //assigns from elements 0 to 25 letters A-Z
         if (c>25) { //if the 25th element is exceed (Z), a null character will be applied to the end of the string - I often find bugs when I do not do this
             alpha[c] = '\0'; break;
@@ -184,8 +202,29 @@ void startupf(char *alpha, char *str_adj, char *origin_mes) { //function to crea
             origin_mes[i] = '\0'; //resolves a bug that occurred due to a missing null character which produced a symbol at the end of the string where it was not specified
         origin_mes[i] = str_adj[i]; //it'd be smart to replace this with strcpy(s1, s2) - unfortunately I came into trouble using this for an unknown reason and hence will continue to use what works
     }  
+    upper_case(str_adj);
+}
+
+void lower_case(/*char *alpha, */char *str_adj) { //since the dictionary that has been given is in lower case, it is faster to change our input rather than 10000 elements.
     for (int i=0; str_adj[i]; i++) { 
-        if (str_adj[i]>=97 && str_adj[i]<=122) //checking for lowercase
-            str_adj[i] = str_adj[i] - 32; //fixing lowercase
+        if (str_adj[i]>=65 && str_adj[i]<=90) //checking for uppercase
+            str_adj[i] = str_adj[i] + 32; //adjusting to lowercase
+        else { //if it is outside the range that is being changed it will be ignored (mostly for white space)
+            str_adj[i] = str_adj[i]; 
+        }
+    }
+    /*for (int i=0; alpha[i]; i++) {
+        if (alpha[i]>=65 && alpha[i]<=90) //checking for uppercase
+            alpha[i] = alpha[i] + 32;
+        else { //if it is outside the range that is being changed it will be ignored (mostly for white space)
+            alpha[i] = alpha[i];
+        }
+    }*/
+}
+
+void upper_case(char *str_adj) { //created due to the annoyances involved with lower_case characters and the dictionary string
+    for (int i=0; str_adj[i]; i++) { 
+    if (str_adj[i]>=97 && str_adj[i]<=122) //checking for lowercase
+        str_adj[i] = str_adj[i] - 32; //fixing lowercase
     }
 }
