@@ -11,7 +11,8 @@ void decryptRotgiven_text(char *str_adj, char *alpha, char *key);
 void lower_case(char *str_adj);  //function to change the entered strings letters all to lower case
 void upper_case(char *str_adj); //function to change the entered strings letters all to upper case
 void startupf(char *alpha, char *str_adj, char *origin_mes, char *key); //function used at the beginning of the program to assign many required strings
-void copy(char *str_adj, char *str2);
+void copy(char *str_adj, char *str2, char *strf);
+void rotate(char *str2, char *strf);
 
 int main() {
     char str_adj[1000]; //creates an empty string that will be used to copy the original message from the input.txt and also be used throughout, changing to meet the cipher 
@@ -137,24 +138,17 @@ void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //defining the
 
 void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message without a given cipher key (rotation)
     int i, k=1, n=1, j, leave=0, count; //i and j are to move through different elements of strings, n is to increment the rotation when checking and also becomes the final 
-                                        //rotation number, replacing k, leave is simply for when a loop needs to break, count is used to count how many letters of the input
-                                        //will match that of words from the list of words
+                                               //rotation number, replacing k, leave is simply for when a loop needs to break, count is used to count how many letters of the input
+                                               //will match that of words from the list of words
     char str2[100]; //alternate string that will take form of str_adj
-    copy(str_adj, str2); //creates a string that copies the first word of the adjustable string (the reason for this is the method required alters the string too greatly)
+    char strf[100];
+    copy(str_adj, str2, strf); //creates a string that copies the first word of the adjustable string (the reason for this is the method required alters the string too greatly)
     FILE *words = fopen("words.txt", "r"); //imports a file containing a long list of words that can be read as shown by the "r" format specifier
     if (words==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
         perror("Results file did not open correctly");
     char string[10000]; //creates a large string that will be able to hold the words from the list
     for (k=1; k<26; k++) { //creates a loop - the value of k will determine the rotation number of the cipher key
-        for (i=0; str2[i]; i++) { //loop serves the purpose of changing the entered message to a different key to be tested
-                if (str2[i]<65 || str2[i]>90)  //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
-                    str2[i] = str2[i]; //nothing changes
-                else {
-                    str2[i] = str2[i] + n; //changes the entire string by 1, effectively rotating the cipher.
-                }
-                if (str2[i] > 90) //if the string eventually exceeds its ASCII range
-                    str2[i] = (char)(str2[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will return this element to the correct range of 65 - 90 characters  
-        }
+        rotate(str2, strf);
         lower_case(str2); //calls a function to change all of the letters in the input to lower case (the dictionary/word list being used is in lower case)
         while (!feof(words)) { //where the problem exists - it needs to restart to begin checking other keys
             fgets(string, 10001, words);
@@ -166,10 +160,27 @@ void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining th
             for (j=0; str2[j]; j++) { //works similar to how i has been used throughout, it allows to move through each element of a string
                 if ((str2[j] == string[j])) { //if the jth letter of the strings are equal, it will be counted
                     count++; //explained previously to be used to determine whether ALL letters in the two given words match
+                   // printf("str2len: %d  stringlen: %d", (int)(strlen(str2)), (int)(strlen(string)));
                     if ((count == strlen(str2)) && count == (strlen(string))) { //commences if all of the letters all the same between the word in the list and the entered message
                         leave = 1; //condition required to leave the overall loop and move onto the next steps
                         //printf("count: %d  strlen(str2): %d strlen(string): %d \n", count, (int)strlen(str2), (int)strlen(string));
                         //printf("str2: %s    string: %s\n", str2, string);
+                        break; //breaks this while loop
+                    }  //for some reason this one does not decrypt the einstein quote as it did previously
+                }
+                else {
+                    break; //if there is no similar letters the loop breaks early as further testing would be redundant
+                }
+            }
+            if (leave == 1) //if a word has been matched, the loop is broken and the key and message can be solved
+                break;
+                for (j=0; strf[j]; j++) { //works similar to how i has been used throughout, it allows to move through each element of a string
+                    if ((strf[j] == string[j])) { //if the jth letter of the strings are equal, it will be counted
+                    count++; //explained previously to be used to determine whether ALL letters in the two given words match
+                    if ((count == strlen(strf)) && count == (strlen(string))) { //commences if all of the letters all the same between the word in the list and the entered message
+                        leave = 1; //condition required to leave the overall loop and move onto the next steps
+                        //printf("count: %d  strlen(strf): %d strlen(string): %d \n", count, (int)strlen(strf), (int)strlen(string));
+                        //printf("strf: %s    string: %s\n", strf, string);
                         break; //breaks this while loop
                     }   
                 }
@@ -258,7 +269,7 @@ void upper_case(char *str_adj) { //created due to the annoyances involved with l
     }
 }
 
-void copy(char *str_adj, char *str2) {
+void copy(char *str_adj, char *str2, char *strf) {
     int i;
     for (i=0; i<=(strlen(str_adj)+1); i++) { //retains the original message and it's respective characters
         if (i>strlen(str_adj))
@@ -278,6 +289,38 @@ void copy(char *str_adj, char *str2) {
     FILE *input_m = fopen("input_a", "r");
     if (input_m==NULL) //tests if the File I/O implementation has an error or failure and does not proceed normally, but instead prints an error
         perror("Results file did not open correctly");
-    fgets(str2, 100, input_m);
+    fgets(str2, 100, input_m); //assigns a string of the first word in the entered message
+    i=0;
+    while (!feof(input_m)) {
+        fgets(strf, 1000, input_m); //assigns a string of the last word in the entered message
+        i++;
+    }
     fclose(input_m);
+    for (i=0; strf[i]; i++) {
+                if (strf[i]>122 || strf[i]<97)
+                    strf[i] = '\0'; //null factor consolidates the true length of the string
+            }
+    printf("strf: %s\n", strf); //for some reason this is blank and breaks the whole thing when decrypting the einstein quote
+}
+
+void rotate(char *str2, char *strf) {
+    int i, n=1;
+    for (i=0; str2[i]; i++) { //loop serves the purpose of changing the entered message to a different key to be tested
+                if (str2[i]<65 || str2[i]>90)  //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
+                    str2[i] = str2[i]; //nothing changes
+                else {
+                    str2[i] = str2[i] + n; //changes the entire string by 1, effectively rotating the cipher.
+                }
+                if (str2[i] > 90) //if the string eventually exceeds its ASCII range
+                    str2[i] = (char)(str2[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will return this element to the correct range of 65 - 90 characters  
+        }
+    for (i=0; strf[i]; i++) { //loop serves the purpose of changing the entered message to a different key to be tested
+                if (strf[i]<65 || strf[i]>90)  //if the string element exists outside the newly rectified ASCII range, it will ignore it, allowing white space
+                    strf[i] = strf[i]; //nothing changes
+                else {
+                    strf[i] = strf[i] + n; //changes the entire string by 1, effectively rotating the cipher.
+                }
+                if (strf[i] > 90) //if the string eventually exceeds its ASCII range
+                    strf[i] = (char)(strf[i]) - 26; //if the encryption rotation exceeds the ASCII limit, this will return this element to the correct range of 65 - 90 characters  
+        }
 }
