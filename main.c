@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <string.h>
 
+//Welcome to the program. This is designed to encrypt and decrypt entered messages.
+//To use this program, the message that you want to be encrypted or decrypted should be entered in
+//the file input.txt and if you have the cipher key, it should be entered in the file cipher.txt
+//There is a prompt for options when the program is run using ./a.out, it has 5 options that can
+//be used, 1: Rotation Encryption (with cipher key), 2: Rotation Decryption (with cipher key)
+//3: Substitution Encryption (with cipher key), 4: Substitution Decryption (with cipher key)
+//5: Rotation Decryption (WITHOUT cipher key)
+//The results of this decryption and encryption will be printed to stdout(the screen) and be written
+//to the file results.txt
+
 //prototypes for all different cipher types - has a void return type as a return is not required since all strings that need to be changed have pointers
 void encryptRot(char *str_adj, char *alpha, char *key);
 void decryptRotgiven_all(char *str_adj, char *alpha, char *key); 
@@ -61,6 +71,11 @@ int main() {
 
 
 //defintion of the cipher functions
+//The adjustable string (str_adj) is pointed to the function which will be changed according to the
+//key which is also pointed to the function in comparison to alpha (alphabet - which is pointed)
+//This function will change str_adj to an encrypted message by the scale of the key and while no
+//values are returned using the return operator, the pointer allows the data changes to stay throughout
+//the program. This type of encryption is a rotation/caeser cipher.
 void encryptRot (char *str_adj, char *alpha, char *key) { //defining the function to do a rotation encryption of the given message with the cipher key given
     int i, n;
     n = ((char)key[0] - (char)alpha[0]); //rotation number determined from the difference between the given key and the alphabet function
@@ -81,7 +96,12 @@ void encryptRot (char *str_adj, char *alpha, char *key) { //defining the functio
         printf("It appears a key has been entered that is the same as the alphabet, hence it will have no effect.");
     }
 }
-
+//defintion of the cipher functions
+//The adjustable string (str_adj) is pointed to the function which will be changed according to the
+//key which is also pointed to the function in comparison to alpha (alphabet - which is pointed)
+//This function will change str_adj to a decrypted message by the scale of the key and while no
+//values are returned using the return operator, the pointer allows the data changes to stay throughout
+//the program. This  is a decryption of a rotation cipher.
 void decryptRotgiven_all(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message in the form of a rotation encryption with the cipher key given
     int i, n; //declaring multiple variables that will be used for different things
     n = -((char)key[0] - (char)alpha[0]); //calculates the rotation number of the cipher
@@ -95,7 +115,12 @@ void decryptRotgiven_all(char *str_adj, char *alpha, char *key) { //defining the
         }
     }
 }
-
+//defintion of the cipher functions
+//The adjustable string (str_adj) is pointed to the function which will be changed according to the
+//key which is also pointed to the function in comparison to alpha (alphabet - which is pointed)
+//This function will change str_adj to an encrypted message by the scale of the key and while no
+//values are returned using the return operator, the pointer allows the data changes to stay throughout
+//the program. This type of encryption is a substitution cipher.
 void encryptSub(char *str_adj, char *alpha, char *key) { //defining the function to do a substitution encrypt the given message with the cipher key given
     int i, n;
     for (i=0; str_adj[i]; i++) {
@@ -113,7 +138,12 @@ void encryptSub(char *str_adj, char *alpha, char *key) { //defining the function
             }
     }
 }
-
+//defintion of the cipher functions
+//The adjustable string (str_adj) is pointed to the function which will be changed according to the
+//key which is also pointed to the function in comparison to alpha (alphabet - which is pointed)
+//This function will change str_adj to an decrypted message by the scale of the key and while no
+//values are returned using the return operator, the pointer allows the data changes to stay throughout
+//the program.
 void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message in the form of a substitution encryption with the cipher key given
     int i, n;
     for (i=0; str_adj[i]; i++) {
@@ -131,8 +161,10 @@ void decrpytSubgiven_all(char *str_adj, char *alpha, char *key) { //defining the
         }
     }
 }
-
-//this is a decryption of a rotation cipher when the key is not given to the program. It works by checking each key and validating whether one is correct if one of the words
+//defintion of the cipher functions
+//The adjustable string (str_adj) is pointed to the function which will be changed according to the
+//key which is also pointed to the function in comparison to alpha (alphabet - which is pointed)
+//This is a decryption of a rotation cipher when the key is not given to the program. It works by checking each key and validating whether one is correct if one of the words
 //of the original string rotated matches that of a list of commonly used words, once this is found the rotation number is stored and the key and decrypted message can be found 
 void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining the function to decrypt the given message without a given cipher key (rotation)
     int i, k=1, j, leave=0, count; //i and j are to move through different elements of strings, replacing k, leave is simply for when a loop needs to break, 
@@ -214,6 +246,9 @@ void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining th
 //}
 
 //this is a startup function to essentially assign the correct values to the many strings used throughout the program
+//the input of alpha is an empty string and has the output of a full string of the alphabet, the input
+//of str_adj is used to copy itself to origin_mes for storage of the original message
+//the argument of the key passed to this function is assigned values of the cipher by File Input.
 void startupf(char *alpha, char *str_adj, char *origin_mes, char *key) { //function to create an alphabet at the beginning of the program when it is executed
     FILE *input; 
     input = fopen("input.txt", "r"); //reads from the text in the input txt file
@@ -268,7 +303,7 @@ void upper_case(char *str_adj) { //created due to the annoyances involved with l
 }
 
 //this function's purpose is to create two strings that contain a single word from the adjustable string(entered message). The words chosen from the string are
-//the first word and the fourth (I picked a random place for the fourth)
+//the first word (str2) and the fourth (strf) (I picked a random place for the fourth)
 void copy(char *str_adj, char *str2, char *strf) { 
     int i;
     for (i=0; i<=(strlen(str_adj)+1); i++) { //retains the original message and it's respective characters - essentially this loop copies the adjustable string to str2
