@@ -51,16 +51,11 @@ int main() {
         fprintf(results, "Entered message: %s\nAltered message: %s\nAlphabet:   %s\nCipher Key: %s\n", origin_mes, str_adj, alpha, key);
         //the line 49, writes the information of the original message and the adjusted message to the txt file called "results.txt"
         //additionally this line also writes information of the cipher key alongside the alphabet for ease of translation or verification if needed
-        printf("The results of the cryptography method used have been written to file \"results.txt\".\nThese results can also be printed to the screen.\n");
+        printf("The results of the cryptography method used have been written to file \"results.txt\".\nThese results will also be printed to the screen: \n");
         fclose(results); //the file has already been written to, hence it no longer needs to remain open, therefore it is closed
     }
-    int i;
-    printf("Enter \"1\" to see results printed, or any other number to exit the program: ");
-    scanf("%d", &i); //provides an additional option if the user wants to the results to be printed to the screen
-    if (i==1) {
         printf("Entered message: %s\nAltered message: %s\n", origin_mes, str_adj); //prints the originally entered message and the ciphered message on different lines
         printf("Alphabet:   %s\nCipher Key: %s\n", alpha, key); //prints the encryption key by showing a comparison of the alphabet to the ciphered alphabet
-    }
     return 0;
 }
 
