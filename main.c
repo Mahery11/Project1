@@ -160,11 +160,8 @@ void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining th
             for (j=0; str2[j]; j++) { //works similar to how i has been used throughout, it allows to move through each element of a string
                 if ((str2[j] == string[j])) { //if the jth letter of the strings are equal, it will be counted
                     count++; //explained previously to be used to determine whether ALL letters in the two given words match
-                   // printf("str2len: %d  stringlen: %d", (int)(strlen(str2)), (int)(strlen(string)));
                     if ((count == strlen(str2)) && count == (strlen(string))) { //commences if all of the letters all the same between the word in the list and the entered message
                         leave = 1; //condition required to leave the overall loop and move onto the next steps
-                        //printf("count: %d  strlen(str2): %d strlen(string): %d \n", count, (int)strlen(str2), (int)strlen(string));
-                        //printf("str2: %s    string: %s\n", str2, string);
                         break; //breaks this while loop
                     }  //for some reason this one does not decrypt the einstein quote as it did previously
                 }
@@ -179,8 +176,6 @@ void decryptRotgiven_text(char *str_adj, char *alpha, char *key) { //defining th
                     count++; //explained previously to be used to determine whether ALL letters in the two given words match
                     if ((count == strlen(strf)) && count == (strlen(string))) { //commences if all of the letters all the same between the word in the list and the entered message
                         leave = 1; //condition required to leave the overall loop and move onto the next steps
-                        //printf("count: %d  strlen(strf): %d strlen(string): %d \n", count, (int)strlen(strf), (int)strlen(string));
-                        //printf("strf: %s    string: %s\n", strf, string);
                         break; //breaks this while loop
                     }   
                 }
@@ -292,15 +287,17 @@ void copy(char *str_adj, char *str2, char *strf) {
     fgets(str2, 100, input_m); //assigns a string of the first word in the entered message
     i=0;
     while (!feof(input_m)) {
-        fgets(strf, 1000, input_m); //assigns a string of the last word in the entered message
+        if (i==4) {
+            fgets(strf, 1000, input_m); //assigns a string of the last word in the entered message
+            }
         i++;
     }
     fclose(input_m);
     for (i=0; strf[i]; i++) {
-                if (strf[i]>122 || strf[i]<97)
+                if (strf[i]>122 || strf[i]<97) //unsure about this variable as it always returns a blank space when printed, yet the Mon Motha decryption works as Mon is not in
+                                               //the word list, so it must be doing something
                     strf[i] = '\0'; //null factor consolidates the true length of the string
             }
-    printf("strf: %s\n", strf); //for some reason this is blank and breaks the whole thing when decrypting the einstein quote
 }
 
 void rotate(char *str2, char *strf) {
